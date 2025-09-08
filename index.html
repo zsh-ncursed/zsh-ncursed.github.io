@@ -4,107 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>somafm_tui - Terminal SomaFM Player</title>
-    <meta name="description" content="A beautiful terminal-based player for SomaFM internet radio with stream buffering support">
+    <meta name="description" content="A console-based player for SomaFM internet radio with stream buffering support">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #8a2be2;
-            --primary-dark: #6a1cb9;
-            --secondary: #00c896;
-            --dark: #121212;
-            --darker: #0a0a0a;
-            --light: #f5f5f5;
-            --gray: #2d2d2d;
-            --terminal-text: #00ff00;
+            --primary: #282c34;
+            --secondary: #61dafb;
+            --accent: #ff6b6b;
+            --text: #ffffff;
+            --text-secondary: #cccccc;
+            --terminal-bg: #1e1e1e;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, var(--darker), var(--dark));
-            color: var(--light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary);
+            color: var(--text);
             line-height: 1.6;
-            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(40, 44, 52, 0.8) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(97, 218, 251, 0.1) 0%, transparent 20%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
         
         header {
             text-align: center;
-            padding: 4rem 2rem 2rem;
-            background: rgba(10, 10, 10, 0.7);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(0, 200, 150, 0.1) 0%, transparent 20%);
-            z-index: -1;
+            padding: 40px 0;
+            animation: fadeIn 1s ease-out;
         }
         
         h1 {
             font-size: 3.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--secondary), var(--accent));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            text-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+            font-weight: 800;
         }
         
         .tagline {
             font-size: 1.5rem;
-            color: #aaa;
-            max-width: 700px;
-            margin: 0 auto 2rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+        
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            margin: 40px 0;
         }
         
         .terminal-container {
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-        }
-        
-        .terminal {
-            background: #1e1e1e;
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--terminal-bg);
             border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             overflow: hidden;
-            border: 1px solid var(--gray);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
         }
         
         .terminal-header {
-            background: var(--gray);
-            padding: 0.8rem 1rem;
+            background-color: #333;
+            padding: 10px 15px;
             display: flex;
             align-items: center;
+            gap: 8px;
         }
         
-        .terminal-dots {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .dot {
-            width: 14px;
-            height: 14px;
+        .terminal-button {
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
         }
         
-        .dot-red { background: #ff5f56; }
-        .dot-yellow { background: #ffbd2e; }
-        .dot-green { background: #27c93f; }
+        .close { background-color: #ff5f56; }
+        .minimize { background-color: #ffbd2e; }
+        .maximize { background-color: #27c93f; }
         
         .terminal-title {
             flex-grow: 1;
@@ -113,197 +105,115 @@
             color: #ccc;
         }
         
-        .terminal-body {
-            padding: 1.5rem;
-            font-family: 'Courier New', monospace;
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: var(--terminal-text);
-            background: rgba(0, 0, 0, 0.7);
-            min-height: 200px;
-            white-space: pre-wrap;
+        .terminal-content {
+            padding: 20px;
+            text-align: center;
         }
         
-        .terminal-prompt {
-            color: #00c896;
-            font-weight: bold;
+        .terminal-screenshot {
+            max-width: 100%;
+            border-radius: 4px;
         }
         
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            padding: 4rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
+            gap: 30px;
+            margin: 60px 0;
         }
         
         .feature-card {
-            background: rgba(30, 30, 30, 0.7);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
-            padding: 2rem;
+            padding: 30px;
             text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid var(--gray);
+            transition: transform 0.3s ease, background 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .feature-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.3);
+            background: rgba(97, 218, 251, 0.1);
         }
         
         .feature-icon {
             font-size: 3rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-        }
-        
-        .feature-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
+            margin-bottom: 20px;
             color: var(--secondary);
         }
         
-        .installation {
-            background: rgba(10, 10, 10, 0.8);
-            padding: 4rem 2rem;
-            text-align: center;
-        }
-        
-        .installation h2 {
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            color: var(--primary);
-        }
-        
-        .install-steps {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: left;
-            background: rgba(30, 30, 30, 0.7);
-            padding: 2rem;
-            border-radius: 10px;
-            border: 1px solid var(--gray);
-        }
-        
-        .install-step {
-            margin-bottom: 1.5rem;
-            padding-left: 2rem;
-            position: relative;
-        }
-        
-        .install-step:before {
-            content: "1";
-            position: absolute;
-            left: 0;
-            top: 0;
-            background: var(--primary);
-            color: white;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-        
-        .install-step:nth-child(2):before { content: "2"; }
-        .install-step:nth-child(3):before { content: "3"; }
-        
-        code {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-        }
-        
-        pre {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 1.5rem;
-            border-radius: 8px;
-            overflow-x: auto;
-            margin: 1.5rem 0;
-            border: 1px solid var(--gray);
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
         }
         
         .cta {
             text-align: center;
-            padding: 4rem 2rem;
-        }
-        
-        .cta h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-        }
-        
-        .cta p {
-            max-width: 700px;
-            margin: 0 auto 2rem;
-            font-size: 1.2rem;
-            color: #ccc;
+            padding: 60px 0;
         }
         
         .btn {
             display: inline-block;
-            background: linear-gradient(to right, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 1rem 2.5rem;
+            background: linear-gradient(to right, var(--secondary), #4db8ff);
+            color: var(--primary);
+            padding: 15px 40px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+            box-shadow: 0 5px 15px rgba(97, 218, 251, 0.4);
         }
         
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.6);
+            box-shadow: 0 8px 20px rgba(97, 218, 251, 0.6);
         }
         
         .btn-secondary {
             background: transparent;
-            border: 2px solid var(--primary);
-            margin-left: 1rem;
+            border: 2px solid var(--secondary);
+            color: var(--secondary);
+            margin-left: 20px;
+            box-shadow: none;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(97, 218, 251, 0.1);
+            box-shadow: 0 5px 15px rgba(97, 218, 251, 0.2);
         }
         
         footer {
             text-align: center;
-            padding: 3rem 2rem;
-            background: rgba(5, 5, 5, 0.9);
-            border-top: 1px solid var(--gray);
-        }
-        
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
+            padding: 40px 0;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 40px;
         }
         
         .social-links {
             display: flex;
             justify-content: center;
-            gap: 1.5rem;
-            margin: 2rem 0;
+            gap: 20px;
+            margin: 20px 0;
         }
         
-        .social-link {
-            color: var(--light);
-            font-size: 2rem;
+        .social-links a {
+            color: var(--text-secondary);
+            font-size: 1.5rem;
             transition: color 0.3s ease;
         }
         
-        .social-link:hover {
-            color: var(--primary);
+        .social-links a:hover {
+            color: var(--secondary);
         }
         
-        .copyright {
-            color: #777;
-            margin-top: 2rem;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         @media (max-width: 768px) {
@@ -315,14 +225,10 @@
                 font-size: 1.2rem;
             }
             
-            .features {
-                grid-template-columns: 1fr;
-            }
-            
             .btn-container {
                 display: flex;
                 flex-direction: column;
-                gap: 1rem;
+                gap: 15px;
             }
             
             .btn-secondary {
@@ -332,120 +238,74 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1>somafm_tui</h1>
-        <p class="tagline">A beautiful terminal-based player for SomaFM internet radio with stream buffering support</p>
-    </header>
-    
-    <div class="terminal-container">
-        <div class="terminal">
-            <div class="terminal-header">
-                <div class="terminal-dots">
-                    <div class="dot dot-red"></div>
-                    <div class="dot dot-yellow"></div>
-                    <div class="dot dot-green"></div>
+    <div class="container">
+        <header>
+            <h1>somafm_tui</h1>
+            <p class="tagline">A console-based player for SomaFM internet radio with stream buffering support</p>
+        </header>
+        
+        <section class="hero">
+            <div class="terminal-container">
+                <div class="terminal-header">
+                    <div class="terminal-button close"></div>
+                    <div class="terminal-button minimize"></div>
+                    <div class="terminal-button maximize"></div>
+                    <div class="terminal-title">somafm_tui</div>
                 </div>
-                <div class="terminal-title">somafm_tui</div>
-                <div style="width: 50px;"></div> <!-- Spacer for alignment -->
+                <div class="terminal-content">
+                    <img src="https://repository-images.githubusercontent.com/534388083/909d6c00-4e5a-4f0b-9c3d-4a1b8e4e8c8f" alt="somafm_tui terminal interface" class="terminal-screenshot">
+                </div>
             </div>
-            <div class="terminal-body">
-<span class="terminal-prompt">user@terminal:~$</span> somafm_tui
-
-<span style="color:#ff5555;">███████╗ ██████╗ ███╗   ███╗ █████╗ ███████╗</span>
-<span style="color:#ff5555;">██╔════╝██╔═══██╗████╗ ████║██╔══██╗██╔════╝</span>
-<span style="color:#ff5555;">███████╗██║   ██║██╔████╔██║███████║█████╗  </span>
-<span style="color:#ff5555;">╚════██║██║   ██║██║╚██╔╝██║██╔══██║██╔══╝  </span>
-<span style="color:#ff5555;">███████║╚██████╔╝██║ ╚═╝ ██║██║  ██║██║     </span>
-<span style="color:#ff5555;">╚══════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     </span>
-
-<span style="color:#55ff55;">[INFO]</span> Welcome to somafm_tui v1.0
-<span style="color:#55ff55;">[INFO]</span> Loading SomaFM stations...
-<span style="color:#55ff55;">[INFO]</span> Buffering: Deep Space One
-<span style="color:#ffff55;">Now Playing:</span> <span style="color:#55ffff;">SomaFM - Deep Space One</span>
-<span style="color:#55ff55;">[INFO]</span> Buffer: ██████████░░░░░ 65%
-<span style="color:#777;">Press 'h' for help, 'q' to quit</span>
-            </div>
-        </div>
-    </div>
-    
-    <div class="features">
-        <div class="feature-card">
-            <div class="feature-icon">
-                <i class="fas fa-terminal"></i>
-            </div>
-            <h3>Terminal Based</h3>
-            <p>Experience SomaFM radio directly in your terminal with an intuitive text-based interface.</p>
-        </div>
+        </section>
         
-        <div class="feature-card">
-            <div class="feature-icon">
-                <i class="fas fa-buffer"></i>
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-terminal"></i>
+                </div>
+                <h3 class="feature-title">Terminal Based</h3>
+                <p>Enjoy SomaFM radio directly in your terminal without graphical overhead. Perfect for remote servers or minimal setups.</p>
             </div>
-            <h3>Stream Buffering</h3>
-            <p>Built-in buffering ensures uninterrupted playback even with unstable connections.</p>
-        </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-buffer"></i>
+                </div>
+                <h3 class="feature-title">Stream Buffering</h3>
+                <p>Built-in buffering support ensures smooth playback even with unstable internet connections.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-music"></i>
+                </div>
+                <h3 class="feature-title">SomaFM Channels</h3>
+                <p>Access all your favorite SomaFM channels from the comfort of your terminal interface.</p>
+            </div>
+        </section>
         
-        <div class="feature-card">
-            <div class="feature-icon">
-                <i class="fas fa-music"></i>
+        <section class="cta">
+            <h2>Get Started with somafm_tui</h2>
+            <p style="margin: 20px 0; max-width: 600px; margin-left: auto; margin-right: auto;">A simple and efficient way to enjoy SomaFM radio in your terminal environment.</p>
+            <div class="btn-container">
+                <a href="https://github.com/zsh-ncursed/somafm_tui" class="btn">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+                <a href="https://github.com/zsh-ncursed/somafm_tui/archive/refs/heads/main.zip" class="btn btn-secondary">
+                    <i class="fas fa-download"></i> Download
+                </a>
             </div>
-            <h3>Multiple Stations</h3>
-            <p>Access all your favorite SomaFM stations from ambient to electronic genres.</p>
-        </div>
-    </div>
-    
-    <div class="installation">
-        <h2>Get Started</h2>
-        <div class="install-steps">
-            <div class="install-step">
-                <h3>Clone the Repository</h3>
-                <p>Get the source code from GitHub:</p>
-                <pre><code>git clone https://github.com/zsh-ncursed/somafm_tui.git
-cd somafm_tui</code></pre>
-            </div>
-            
-            <div class="install-step">
-                <h3>Install Dependencies</h3>
-                <p>Make sure you have the required dependencies:</p>
-                <pre><code># Example dependencies (adjust based on actual requirements)
-sudo apt install libmpv-dev libcurl4-openssl-dev</code></pre>
-            </div>
-            
-            <div class="install-step">
-                <h3>Build and Run</h3>
-                <p>Compile and start enjoying SomaFM:</p>
-                <pre><code>make
-./somafm_tui</code></pre>
-            </div>
-        </div>
-    </div>
-    
-    <div class="cta">
-        <h2>Experience SomaFM Differently</h2>
-        <p>Enjoy your favorite internet radio stations without leaving the comfort of your terminal.</p>
-        <div class="btn-container">
-            <a href="https://github.com/zsh-ncursed/somafm_tui" class="btn">
-                <i class="fab fa-github"></i> View on GitHub
-            </a>
-            <a href="https://github.com/zsh-ncursed/somafm_tui/archive/refs/heads/main.zip" class="btn btn-secondary">
-                <i class="fas fa-download"></i> Download Source
-            </a>
-        </div>
-    </div>
-    
-    <footer>
-        <div class="footer-content">
-            <h3>somafm_tui</h3>
-            <p>A console-based player for SomaFM internet radio</p>
-            
+        </section>
+        
+        <footer>
             <div class="social-links">
-                <a href="https://github.com/zsh-ncursed/somafm_tui" class="social-link" aria-label="GitHub">
+                <a href="https://github.com/zsh-ncursed/somafm_tui" aria-label="GitHub">
                     <i class="fab fa-github"></i>
                 </a>
             </div>
-            
-            <p class="copyright">Created with ❤️ for terminal enthusiasts | somafm_tui &copy; 2025</p>
-        </div>
-    </footer>
+            <p>somafm_tui - A console-based player for SomaFM internet radio</p>
+            <p>Made with <i class="fas fa-heart" style="color: var(--accent);"></i> for terminal enthusiasts</p>
+        </footer>
+    </div>
 </body>
 </html>
