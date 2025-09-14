@@ -4,18 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>somafm_tui - Terminal SomaFM Player</title>
-    <meta name="description" content="A beautiful terminal-based player for SomaFM internet radio with stream buffering support">
+    <meta name="description" content="A beautiful terminal-based player for SomaFM internet radio with stream buffering support, 20+ color themes, and intuitive TUI controls">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #8a2be2;
             --primary-dark: #6a1cb9;
             --secondary: #00c896;
+            --accent: #ff6b6b;
             --dark: #121212;
             --darker: #0a0a0a;
             --light: #f5f5f5;
             --gray: #2d2d2d;
+            --gray-light: #444;
             --terminal-text: #00ff00;
+            --terminal-bg: #1e1e1e;
         }
         
         * {
@@ -77,7 +80,7 @@
         }
         
         .terminal {
-            background: #1e1e1e;
+            background: var(--terminal-bg);
             border-radius: 8px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             overflow: hidden;
@@ -129,13 +132,34 @@
             font-weight: bold;
         }
         
+        .section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--primary);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: "";
+            display: block;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            margin: 0.5rem auto;
+            border-radius: 2px;
+        }
+        
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-            padding: 4rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
         }
         
         .feature-card {
@@ -164,53 +188,150 @@
             color: var(--secondary);
         }
         
-        .installation {
-            background: rgba(10, 10, 10, 0.8);
-            padding: 4rem 2rem;
+        .themes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .theme-card {
+            background: var(--terminal-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--gray);
+            transition: transform 0.3s ease;
+        }
+        
+        .theme-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .theme-preview {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            padding: 1rem;
+        }
+        
+        .theme-info {
+            padding: 1rem;
             text-align: center;
         }
         
-        .installation h2 {
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            color: var(--primary);
+        .theme-info h4 {
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
         }
         
-        .install-steps {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: left;
+        .installation-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tab-btn {
+            background: rgba(138, 43, 226, 0.2);
+            color: var(--light);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active, .tab-btn:hover {
+            background: var(--primary);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+        
+        .tab-content {
+            display: none;
             background: rgba(30, 30, 30, 0.7);
             padding: 2rem;
             border-radius: 10px;
             border: 1px solid var(--gray);
         }
         
-        .install-step {
-            margin-bottom: 1.5rem;
-            padding-left: 2rem;
-            position: relative;
+        .tab-content.active {
+            display: block;
         }
         
-        .install-step:before {
-            content: "1";
-            position: absolute;
-            left: 0;
-            top: 0;
-            background: var(--primary);
-            color: white;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .key-group {
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid var(--gray);
+        }
+        
+        .key-group h3 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .key-list {
+            list-style: none;
+        }
+        
+        .key-item {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        
+        .key-item:last-child {
+            border-bottom: none;
+        }
+        
+        .key {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
             font-weight: bold;
         }
         
-        .install-step:nth-child(2):before { content: "2"; }
-        .install-step:nth-child(3):before { content: "3"; }
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--gray);
+        }
+        
+        .config-table th, .config-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        
+        .config-table th {
+            background: rgba(138, 43, 226, 0.2);
+            color: var(--secondary);
+        }
+        
+        .config-table tr:last-child td {
+            border-bottom: none;
+        }
         
         code {
             background: rgba(0, 0, 0, 0.5);
@@ -231,6 +352,7 @@
         .cta {
             text-align: center;
             padding: 4rem 2rem;
+            background: rgba(10, 10, 10, 0.8);
         }
         
         .cta h2 {
@@ -259,6 +381,7 @@
             border: none;
             cursor: pointer;
             box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+            margin: 0.5rem;
         }
         
         .btn:hover {
@@ -269,7 +392,15 @@
         .btn-secondary {
             background: transparent;
             border: 2px solid var(--primary);
-            margin-left: 1rem;
+        }
+        
+        .btn-accent {
+            background: linear-gradient(to right, var(--accent), #ff5252);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn-accent:hover {
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
         }
         
         footer {
@@ -315,7 +446,15 @@
                 font-size: 1.2rem;
             }
             
-            .features {
+            .section {
+                padding: 2rem 1rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .features, .usage-grid {
                 grid-template-columns: 1fr;
             }
             
@@ -325,8 +464,16 @@
                 gap: 1rem;
             }
             
+            .btn {
+                margin: 0.5rem 0;
+            }
+            
             .btn-secondary {
                 margin-left: 0;
+            }
+            
+            .tab-buttons {
+                flex-direction: column;
             }
         }
     </style>
@@ -334,7 +481,7 @@
 <body>
     <header>
         <h1>somafm_tui</h1>
-        <p class="tagline">A beautiful terminal-based player for SomaFM internet radio with stream buffering support</p>
+        <p class="tagline">A beautiful terminal-based player for SomaFM internet radio with stream buffering support, 20+ color themes, and intuitive TUI controls</p>
     </header>
     
     <div class="terminal-container">
@@ -368,67 +515,369 @@
         </div>
     </div>
     
-    <div class="features">
-        <div class="feature-card">
-            <div class="feature-icon">
-                <i class="fas fa-terminal"></i>
+    <div class="section">
+        <h2 class="section-title">Features</h2>
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-terminal"></i>
+                </div>
+                <h3>Unified Interface</h3>
+                <p>Combined channel list and playback in split-screen layout for efficient navigation and monitoring.</p>
             </div>
-            <h3>Terminal Based</h3>
-            <p>Experience SomaFM radio directly in your terminal with an intuitive text-based interface.</p>
-        </div>
-        
-        <div class="feature-card">
-            <div class="feature-icon">
-                <i class="fas fa-buffer"></i>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3>20+ Color Themes</h3>
+                <p>Choose from 5 light and 15 dark themes with alternative background mode for personalized experience.</p>
             </div>
-            <h3>Stream Buffering</h3>
-            <p>Built-in buffering ensures uninterrupted playback even with unstable connections.</p>
-        </div>
-        
-        <div class="feature-card">
-            <div class="feature-icon">
-                <i class="fas fa-music"></i>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <h3>Automatic Updates</h3>
+                <p>Always up-to-date with the latest SomaFM channel list fetched automatically.</p>
             </div>
-            <h3>Multiple Stations</h3>
-            <p>Access all your favorite SomaFM stations from ambient to electronic genres.</p>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-keyboard"></i>
+                </div>
+                <h3>Intuitive Controls</h3>
+                <p>Vim-style keys (hjkl) and arrow key support for seamless navigation and control.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-buffer"></i>
+                </div>
+                <h3>Stream Buffering</h3>
+                <p>Built-in buffering ensures uninterrupted playback even with unstable connections.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3>Track History</h3>
+                <p>Real-time metadata and playback history to never miss your favorite tracks.</p>
+            </div>
         </div>
     </div>
     
-    <div class="installation">
-        <h2>Get Started</h2>
-        <div class="install-steps">
-            <div class="install-step">
-                <h3>Clone the Repository</h3>
-                <p>Get the source code from GitHub:</p>
-                <pre><code>git clone https://github.com/zsh-ncursed/somafm_tui.git
-cd somafm_tui</code></pre>
+    <div class="section">
+        <h2 class="section-title">Theme Showcase</h2>
+        <p style="text-align: center; max-width: 700px; margin: 0 auto 2rem; color: #ccc;">
+            somafm_tui comes with 20 built-in color themes to match your terminal preferences. 
+            Here are some examples of the dark themes available:
+        </p>
+        <div class="themes-grid">
+            <div class="theme-card">
+                <div class="theme-preview" style="background: #1e1e1e; color: #00ff00;">
+                    <div>
+                        <div>Default Theme</div>
+                        <div style="margin-top: 10px;">███████████████</div>
+                    </div>
+                </div>
+                <div class="theme-info">
+                    <h4>Default</h4>
+                    <p>Classic green terminal</p>
+                </div>
             </div>
             
-            <div class="install-step">
-                <h3>Install Dependencies</h3>
-                <p>Make sure you have the required dependencies:</p>
-                <pre><code># Example dependencies (adjust based on actual requirements)
-sudo apt install libmpv-dev libcurl4-openssl-dev</code></pre>
+            <div class="theme-card">
+                <div class="theme-preview" style="background: #282a36; color: #f8f8f2;">
+                    <div>
+                        <div>Dracula Theme</div>
+                        <div style="margin-top: 10px;">███████████████</div>
+                    </div>
+                </div>
+                <div class="theme-info">
+                    <h4>Dracula</h4>
+                    <p>Dark purple accents</p>
+                </div>
             </div>
             
-            <div class="install-step">
-                <h3>Build and Run</h3>
-                <p>Compile and start enjoying SomaFM:</p>
-                <pre><code>make
-./somafm_tui</code></pre>
+            <div class="theme-card">
+                <div class="theme-preview" style="background: #1e1f29; color: #2de09e;">
+                    <div>
+                        <div>Monokai Theme</div>
+                        <div style="margin-top: 10px;">███████████████</div>
+                    </div>
+                </div>
+                <div class="theme-info">
+                    <h4>Monokai</h4>
+                    <p>Vibrant color scheme</p>
+                </div>
+            </div>
+            
+            <div class="theme-card">
+                <div class="theme-preview" style="background: #0f111a; color: #8be9fd;">
+                    <div>
+                        <div>Nord Theme</div>
+                        <div style="margin-top: 10px;">███████████████</div>
+                    </div>
+                </div>
+                <div class="theme-info">
+                    <h4>Nord</h4>
+                    <p>Arctic-inspired palette</p>
+                </div>
             </div>
         </div>
+        <p style="text-align: center; margin-top: 2rem; color: #aaa;">
+            Plus 16 more themes including light themes like GitHub Light and Solarized Light
+        </p>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Installation</h2>
+        <div class="installation-tabs">
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="arch">Arch Linux</button>
+                <button class="tab-btn" data-tab="ubuntu">Ubuntu/Debian</button>
+                <button class="tab-btn" data-tab="fedora">Fedora</button>
+                <button class="tab-btn" data-tab="manual">Manual Install</button>
+            </div>
+            
+            <div id="arch" class="tab-content active">
+                <h3>Arch Linux Installation</h3>
+                <p>For Arch Linux users, you can install somafm_tui directly from the AUR:</p>
+                <pre><code># Using yay
+yay -S somafm_tui
+
+# Using paru
+paru -S somafm_tui
+
+# Manual installation from AUR
+git clone https://aur.archlinux.org/somafm_tui.git
+cd somafm_tui
+makepkg -si</code></pre>
+            </div>
+            
+            <div id="ubuntu" class="tab-content">
+                <h3>Ubuntu/Debian Installation</h3>
+                <p>Install system dependencies and then the application:</p>
+                <pre><code># Install system dependencies
+sudo apt-get update
+sudo apt-get install mpv python3 python3-pip
+
+# Clone the repository
+git clone https://github.com/zsh-ncursed/somafm_tui.git
+cd somafm_tui
+
+# Create and activate virtual environment (optional but recommended)
+python3 -m venv venv
+source venv/bin/activate
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Run the application
+python somafm.py</code></pre>
+            </div>
+            
+            <div id="fedora" class="tab-content">
+                <h3>Fedora Installation</h3>
+                <p>Install system dependencies and then the application:</p>
+                <pre><code># Install system dependencies
+sudo dnf install mpv python3 python3-pip
+
+# Clone the repository
+git clone https://github.com/zsh-ncursed/somafm_tui.git
+cd somafm_tui
+
+# Create and activate virtual environment (optional but recommended)
+python3 -m venv venv
+source venv/bin/activate
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Run the application
+python somafm.py</code></pre>
+            </div>
+            
+            <div id="manual" class="tab-content">
+                <h3>Manual Installation</h3>
+                <p>For other Linux distributions or manual installation:</p>
+                <pre><code># Install system dependencies (adjust for your distro)
+# You need: mpv, python 3.7+, pip
+
+# Clone the repository
+git clone https://github.com/zsh-ncursed/somafm_tui.git
+cd somafm_tui
+
+# Create and activate virtual environment (optional but recommended)
+python3 -m venv venv
+source venv/bin/activate
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Run the application
+python somafm.py</code></pre>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Usage Instructions</h2>
+        <div class="usage-grid">
+            <div class="key-group">
+                <h3>Navigation</h3>
+                <ul class="key-list">
+                    <li class="key-item">
+                        <span>Move Up</span>
+                        <span class="key">↑</span> or <span class="key">k</span>
+                    </li>
+                    <li class="key-item">
+                        <span>Move Down</span>
+                        <span class="key">↓</span> or <span class="key">j</span>
+                    </li>
+                    <li class="key-item">
+                        <span>Play Selected</span>
+                        <span class="key">Enter</span> or <span class="key">l</span>
+                    </li>
+                    <li class="key-item">
+                        <span>Search</span>
+                        <span class="key">/</span>
+                    </li>
+                    <li class="key-item">
+                        <span>Quit</span>
+                        <span class="key">q</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="key-group">
+                <h3>Playback Controls</h3>
+                <ul class="key-list">
+                    <li class="key-item">
+                        <span>Pause/Resume</span>
+                        <span class="key">Space</span>
+                    </li>
+                    <li class="key-item">
+                        <span>Stop</span>
+                        <span class="key">h</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="key-group">
+                <h3>Theme & Favorites</h3>
+                <ul class="key-list">
+                    <li class="key-item">
+                        <span>Change Theme</span>
+                        <span class="key">t</span>
+                    </li>
+                    <li class="key-item">
+                        <span>Toggle Background</span>
+                        <span class="key">a</span>
+                    </li>
+                    <li class="key-item">
+                        <span>Add to Favorites</span>
+                        <span class="key">f</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2 class="section-title">Configuration</h2>
+        <p style="text-align: center; max-width: 700px; margin: 0 auto 2rem; color: #ccc;">
+            Customize your somafm_tui experience with the configuration file and understand where data is stored.
+        </p>
+        
+        <h3 style="text-align: center; margin-bottom: 1rem;">Configuration File: <code>~/.somafm_tui/somafm.cfg</code></h3>
+        
+        <table class="config-table">
+            <thead>
+                <tr>
+                    <th>Setting</th>
+                    <th>Description</th>
+                    <th>Default Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>buffer_minutes</code></td>
+                    <td>Duration of audio buffering in minutes</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td><code>buffer_size_mb</code></td>
+                    <td>Maximum size of buffer in megabytes</td>
+                    <td>50</td>
+                </tr>
+                <tr>
+                    <td><code>theme</code></td>
+                    <td>Color theme for the interface</td>
+                    <td>default</td>
+                </tr>
+                <tr>
+                    <td><code>alternative_bg_mode</code></td>
+                    <td>Use pure black background instead of dark gray</td>
+                    <td>false</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3 style="text-align: center; margin: 2rem 0 1rem;">Data Storage Locations</h3>
+        
+        <table class="config-table">
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>~/.somafm_tui/somafm.cfg</code></td>
+                    <td>Configuration file</td>
+                </tr>
+                <tr>
+                    <td><code>~/.somafm_tui/channel_favorites.json</code></td>
+                    <td>Favorite channels list</td>
+                </tr>
+                <tr>
+                    <td><code>~/.somafm_tui/channel_usage.json</code></td>
+                    <td>Channel usage statistics</td>
+                </tr>
+                <tr>
+                    <td><code>~/.somafm_tui/favorites.list</code></td>
+                    <td>Favorite tracks list</td>
+                </tr>
+                <tr>
+                    <td><code>/tmp/.somafmtmp/</code></td>
+                    <td>Temporary files directory</td>
+                </tr>
+                <tr>
+                    <td><code>/tmp/.somafmtmp/somafm.log</code></td>
+                    <td>Log file for debugging</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     
     <div class="cta">
         <h2>Experience SomaFM Differently</h2>
-        <p>Enjoy your favorite internet radio stations without leaving the comfort of your terminal.</p>
-        <div class="btn-container">
+        <p>Enjoy your favorite internet radio stations without leaving the comfort of your terminal. 
+        With 20+ themes, intuitive controls, and robust buffering, somafm_tui provides the perfect 
+        listening experience for terminal enthusiasts.</p>
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem;">
             <a href="https://github.com/zsh-ncursed/somafm_tui" class="btn">
                 <i class="fab fa-github"></i> View on GitHub
             </a>
             <a href="https://github.com/zsh-ncursed/somafm_tui/archive/refs/heads/main.zip" class="btn btn-secondary">
                 <i class="fas fa-download"></i> Download Source
+            </a>
+            <a href="https://github.com/zsh-ncursed/somafm_tui/issues" class="btn btn-accent">
+                <i class="fas fa-bug"></i> Report Issue
             </a>
         </div>
     </div>
@@ -447,5 +896,28 @@ sudo apt install libmpv-dev libcurl4-openssl-dev</code></pre>
             <p class="copyright">Created with ❤️ for terminal enthusiasts | somafm_tui &copy; 2025</p>
         </div>
     </footer>
+    
+    <script>
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons and contents
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = btn.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        });
+    </script>
 </body>
 </html>
